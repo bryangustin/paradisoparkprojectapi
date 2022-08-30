@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ConfirmationBookingController;
+use App\Mail\ConfirmationBooking;
+use App\Mail\PasswordChange;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,5 +16,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+ return view('welcome');  
 });
+
+Route::get('/password-change/{id}',function ($id) {
+    return view('myTemplate.PasswordChange')->with('data', $id);  
+});
+
