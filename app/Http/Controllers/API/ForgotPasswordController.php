@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
+use App\Mail\ForgotPassword;
 
 class ForgotPasswordController extends Controller
 {
@@ -23,18 +24,20 @@ class ForgotPasswordController extends Controller
 
         $token = Str::random(64);
 
-        DB::table('password_resets')->insert([
+        $message = [
             'email' => $request->email,
             'token' => $token,
             'created_at' => Carbon::now()
-        ]);
+        ];
+        DB::table('password_resets')->insert($message);
 
         $response = ['message' => 'Successfully reset!'];
 
-        Mail::send('email.forgetPassword', ['token' => $token], function($message) use($request){
-            $message->to($request->email);
-            $message->subject('Reset Password');
-        });
+        // Mail::send('email.forgetPassword', ['token' => $token], function($message) use($request){
+        //     $message->to($request->email);
+        //     $message->subject('Reset Password');
+        // });
+        Mail::to($request->email)->send(new ForgotPassword($message));
 
         return response()->json($response);
     }
@@ -46,6 +49,7 @@ class ForgotPasswordController extends Controller
 
     public function submitResetPasswordForm(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users',
             'password' => [
